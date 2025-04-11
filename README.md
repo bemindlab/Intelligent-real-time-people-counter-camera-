@@ -1,5 +1,6 @@
-# System Requirements Specification  
-**Project Name:** Intelligent Real-Time People Counter with Re-ID, Logging, and Firebase Sync  
+
+# MANTA – Monitoring and Analytics Node for Tracking Activity  
+**Project Name:** MANTA  
 **Version:** 1.1  
 **Date:** 2025-04-11
 
@@ -159,3 +160,170 @@ volumes:
 - Web dashboard ดู realtime จาก Firebase
 - Heatmap วิเคราะห์จำนวนคนในช่วงเวลาต่าง ๆ
 - Face recognition หรือ Emotion detection (อนาคต)
+
+---
+
+## 10. Code Repository Structure
+
+```
+manta/
+├── camera/
+│   ├── main.py                # โปรแกรมหลักบนกล้อง
+│   ├── detection.py           # YOLO detect person
+│   ├── reid.py                # Feature hashing / vector comparison
+│   ├── logger.py              # เขียน log ลง local
+│   └── uploader.py            # ดัน log ขึ้น Firebase
+│
+├── models/
+│   ├── yolov8n.onnx           # YOLO model (exported)
+│   ├── face_encoder.onnx      # optional: model สำหรับ vectorize ใบหน้า
+│   └── requirements.txt       # ไลบรารีที่ใช้บนกล้อง
+│
+├── dataset/
+│   ├── images/                # ภาพ dataset (ถ้าเทรนเอง)
+│   ├── labels/                # YOLO format labels
+│   └── dataset.yaml           # config YOLO
+│
+├── n8n/
+│   ├── docker-compose.yml     # สำหรับรัน n8n workflow automation
+│   └── workflows/             # ไฟล์ workflow JSON ของ n8n
+│
+├── firebase/
+│   ├── firebase_config.json   # Service account key
+│   └── firebase_utils.py      # ฟังก์ชันส่ง log ไปยัง Firebase
+│
+├── utils/
+│   ├── camera_utils.py        # อ่านภาพจากกล้อง, ตั้งค่า stream
+│   └── vector_utils.py        # cosine similarity, hashing
+│
+├── config/
+│   └── config.yaml            # config เช่น camera_id, thresholds, Firebase path
+│
+├── logs/
+│   └── local_log.json         # log ที่เก็บในเครื่อง
+│
+├── README.md
+└── manta-spec.md              # Requirements spec
+```
+
+---
+
+## 11. Run Instructions
+
+### 11.1 Development Mode (Dev)
+ใช้สำหรับทดสอบบนเครื่องหรือบน Raspberry Pi แบบ interactive:
+```bash
+# ติดตั้ง dependencies (เฉพาะครั้งแรก)
+pip install -r models/requirements.txt
+
+# รัน main script แบบ dev
+python camera/main.py --debug
+```
+
+### 11.2 Debug Mode
+เปิด log เพิ่มเติม, แสดง vector, และไม่ส่งข้อมูลไป Firebase:
+```bash
+python camera/main.py --debug --no-upload
+```
+
+### 11.3 Production Mode
+ใช้กับ systemd หรือ supervisor บน Raspberry Pi:
+```bash
+# ตัวอย่างรันแบบ background
+python camera/main.py --config config/config.yaml
+```
+
+หรือเพิ่มใน `systemd`:
+```
+[Unit]
+Description=MANTA People Counter
+
+[Service]
+ExecStart=/usr/bin/python3 /home/pi/manta/camera/main.py --config /home/pi/manta/config/config.yaml
+WorkingDirectory=/home/pi/manta
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+---
+
+## 12. System Setup & Dependencies
+
+### 12.1 Operating System Preparation (for Raspberry Pi 5)
+1. Flash Raspberry Pi OS (64-bit) Lite using Raspberry Pi Imager
+2. Enable SSH (optional): Create an empty file named `ssh` in the boot partition
+3. Connect to Wi-Fi (optional): Create `wpa_supplicant.conf` in boot
+4. Boot up and run:
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3-pip python3-opencv libatlas-base-dev libjpeg-dev libtiff5 -y
+sudo apt install docker.io docker-compose -y
+```
+
+### 12.2 Python Dependencies
+```bash
+pip3 install -r models/requirements.txt
+```
+
+### 12.3 Required Services
+- **Firebase**: Create project, enable Realtime Database, download service key
+- **n8n**: Run via Docker (see Section 6)
+- **Camera driver**: Enable with `sudo raspi-config` → Interface → Camera
+
+---
+
+## 13. Project Structure by Importance
+
+### **Core Components**
+- `camera/main.py`: Real-time detection + Re-ID logic
+- `detection.py`, `reid.py`: Model inference + vector matching
+- `logger.py`, `uploader.py`: Log management and cloud sync
+
+### **Support Systems**
+- `firebase_utils.py`: Push to Firebase
+- `n8n/`: Automation layer for alerts, reports, backups
+- `config/config.yaml`: Runtime control and system parameters
+
+### **Tools & Dataset**
+- `dataset/`: For custom model training
+- `models/`: YOLO and encoder models
+- `utils/`: Shared helper functions
+- `logs/`: Local backup of people logs
+
+---
+
+## 14. Open Source & Collaboration
+
+### **MANTA is Open Source** – Commercially deployable
+
+เราพัฒนาโปรเจกต์นี้ให้เป็น **Open Source Core** ที่ทุกคนสามารถ:
+- Fork, แก้ไข, หรือปรับแต่งตามความต้องการ
+- ร่วมพัฒนาใน GitHub ผ่าน issues, pull requests หรือ discussions
+- ใช้งานฟรีในโครงการวิจัย การศึกษา หรือโปรเจกต์ส่วนตัว
+
+### **Commercial Usage**
+เราเปิดให้ใช้ **MANTA เป็น Solution-as-a-Service (SaaS)** หรือ On-premise solution สำหรับ:
+- ร้านค้าอัจฉริยะ
+- โครงการ Smart City
+- ระบบความปลอดภัยอัตโนมัติ
+
+หากสนใจ **ซื้อระบบแบบ turnkey หรือปรึกษาการติดตั้งใช้งาน**  
+สามารถติดต่อผ่านหน้า GitHub หรืออีเมลใน repo ได้โดยตรง
+
+---
+
+## 15. Want to Contribute?
+
+เรายินดีต้อนรับทุกคนที่อยากมีส่วนร่วม!  
+สิ่งที่คุณสามารถช่วยได้:
+- ปรับปรุงประสิทธิภาพ Re-ID
+- ทำ Dashboard UI แบบ Real-time
+- พัฒนาตัวนับ Heatmap หรือกล้องหลายตัว
+- เขียนเอกสารคู่มือเพิ่มเติม
+- ทดสอบบนบอร์ดต่าง ๆ
+
+**GitHub Repo:** (ลิงก์จะใส่ภายหลัง)  
+**License:** MIT License  
+**Contact:** dev@manta-system.dev
