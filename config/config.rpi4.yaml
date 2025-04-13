@@ -1,0 +1,62 @@
+# MANTA การกำหนดค่าสำหรับ Raspberry Pi 4
+# Version: 1.0
+
+# การกำหนดค่ากล้อง (Camera Configuration)
+camera:
+  id: "rpi4_cam"  # รหัสประจำตัวกล้อง
+  source: 0  # 0 สำหรับกล้อง Raspberry Pi Camera Module หรือกล้อง USB เริ่มต้น
+  resolution:
+    width: 640  # ความละเอียดที่เหมาะสมสำหรับ RPi4
+    height: 480
+  fps: 10  # ลด FPS เพื่อประสิทธิภาพที่ดีขึ้นบน RPi4
+  prefer_picamera: true  # ใช้ PiCamera API ถ้ามี (แนะนำสำหรับประสิทธิภาพที่ดีขึ้น)
+
+# การกำหนดค่าการตรวจจับ (Detection Configuration)
+detection:
+  model_path: "models/yolov8n.onnx"  # ใช้โมเดลขนาดเล็ก
+  confidence_threshold: 0.45  # ปรับลดเล็กน้อยเพื่อประสิทธิภาพที่ดีขึ้น
+  nms_threshold: 0.5
+  device: "CPU"  # RPi4 ไม่มี GPU ที่รองรับ CUDA
+  classes:
+    - person
+  frame_skip: 2  # ข้ามเฟรมเพื่อประสิทธิภาพที่ดีขึ้น (ทุกเฟรมที่ 3 จะถูกประมวลผล)
+
+# การกำหนดค่าการจดจำบุคคล (Re-identification Configuration)
+reid:
+  feature_size: 64  # ลดขนาดเวกเตอร์คุณลักษณะเพื่อประสิทธิภาพที่ดีขึ้น
+  similarity_threshold: 0.55
+  retention_period: 1800  # จดจำบุคคลเป็นเวลา 30 นาที (ลดจาก 1 ชั่วโมง)
+  max_stored_vectors: 100  # จำกัดจำนวนเวกเตอร์ที่จัดเก็บสำหรับหน่วยความจำที่จำกัด
+
+# การกำหนดค่าการบันทึกข้อมูล (Logging Configuration)
+logging:
+  local_path: "logs/rpi4_log.json"
+  log_level: "INFO"
+  retention_days: 3  # เก็บบันทึกเพียง 3 วันเนื่องจากข้อจำกัดของพื้นที่จัดเก็บ
+  log_flush_interval: 60  # บันทึกลงดิสก์ทุก 60 วินาทีเพื่อลดการเขียนดิสก์
+
+# การกำหนดค่า Firebase (Firebase Configuration)
+firebase:
+  enabled: true
+  config_path: "firebase/firebase_config.json"
+  database_url: "https://your-project-id.firebaseio.com"
+  path_prefix: "cameras/rpi4"
+  retry_interval: 120  # เพิ่มเวลาระหว่างการลองใหม่เพื่อประหยัดแบนด์วิดท์
+  batch_size: 20  # เพิ่มขนาดชุดเพื่อลดการส่งข้อมูล
+  upload_interval: 300  # อัปโหลดทุก 5 นาทีเพื่อประหยัดทรัพยากร
+
+# การกำหนดค่า n8n (n8n Configuration)
+n8n:
+  webhook_url: "http://your-n8n-instance:5678/webhook/manta_rpi4"
+  notify_events:
+    - new_person
+    - offline_mode
+    - error
+
+# การกำหนดค่าระบบ (System Configuration)
+system:
+  debug: false
+  show_video: false  # ปิดการแสดงผลวิดีโอเพื่อประหยัดหน่วยความจำและ CPU
+  memory_limit: 75  # จำกัดการใช้หน่วยความจำสูงสุดเป็นเปอร์เซ็นต์
+  cpu_threads: 3  # จำกัดการใช้เธรด CPU (RPi4 มี 4 คอร์)
+  enable_watchdog: true  # เปิดใช้งาน watchdog เพื่อรีสตาร์ทเมื่อเกิดปัญหา

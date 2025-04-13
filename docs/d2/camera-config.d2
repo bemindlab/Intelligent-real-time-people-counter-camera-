@@ -1,0 +1,314 @@
+## MANTA Remote Camera Configuration
+direction: down
+
+# Define styles
+styles: {
+  component: {
+    shape: rectangle
+    fill: "#E8EAF6"
+    stroke: "#3F51B5"
+    border-radius: 10
+    shadow: true
+  }
+  server: {
+    shape: rectangle
+    fill: "#E0F2F1"
+    stroke: "#00897B"
+    border-radius: 5
+    shadow: true
+  }
+  webui: {
+    shape: rectangle
+    fill: "#F3E5F5"
+    stroke: "#9C27B0"
+    border-radius: 8
+    shadow: true
+  }
+  api: {
+    shape: hexagon
+    fill: "#FFF3E0" 
+    stroke: "#FF9800"
+  }
+  config: {
+    shape: document
+    fill: "#E0F7FA"
+    stroke: "#00BCD4"
+  }
+  file: {
+    shape: page
+    fill: "#F1F8E9"
+    stroke: "#8BC34A"
+  }
+  process: {
+    shape: rectangle
+    fill: "#FFEBEE"
+    stroke: "#F44336"
+    border-radius: 8
+    shadow: true
+  }
+  device: {
+    shape: rectangle
+    fill: "#ECEFF1"
+    stroke: "#607D8B"
+    border-radius: 10
+    shadow: true
+  }
+  mobile: {
+    shape: image
+    icon: https://icons.terrastruct.com/essentials%2F362-smartphone.svg
+    width: 50
+    height: 50
+  }
+  laptop: {
+    shape: image
+    icon: https://icons.terrastruct.com/devices%2Flaptop.svg
+    width: 60
+    height: 60
+  }
+  camera: {
+    shape: image
+    icon: https://icons.terrastruct.com/aws%2FInternet%20of%20Things%2FIoT_Camera_light-bg.svg
+    width: 60
+    height: 60
+  }
+  wifi: {
+    shape: image
+    icon: https://icons.terrastruct.com/azure%2FNetworking%20Service%20Color%2FVirtual%20Networks.svg
+    width: 50
+    height: 50
+  }
+  database: {
+    shape: cylinder
+    fill: "#E8F5E9"
+    stroke: "#4CAF50"
+  }
+  service: {
+    shape: hexagon
+    fill: "#E1F5FE"
+    stroke: "#03A9F4"
+  }
+  container: {
+    border-radius: 10
+    shadow: true
+  }
+}
+
+title: {
+  label: MANTA Camera - Remote Configuration System
+  near: top-center
+  shape: text
+  style: {
+    font-size: 24
+    font-color: "#212121"
+    bold: true
+    underline: true
+  }
+}
+
+# Remote Configuration Components
+remote_config: {
+  label: Remote Configuration System
+  style: container
+  style.fill: "#ECEFF1"
+  
+  # Core components
+  http_server: {
+    label: HTTP Server
+    description: "Flask web server\nPort 8080"
+    style: server
+  }
+  
+  web_interface: {
+    label: Web Interface
+    description: "Browser-based UI"
+    style: webui
+  }
+  
+  rest_api: {
+    label: REST API
+    description: "JSON endpoints"
+    style: api
+  }
+  
+  config_manager: {
+    label: Configuration Manager
+    description: "Load/save settings\nHandle encryption"
+    style: component
+  }
+  
+  config_backup: {
+    label: Configuration Backup
+    description: "Versioned backups"
+    style: database
+  }
+  
+  # Network components
+  wifi_direct: {
+    label: WiFi Direct Manager
+    description: "Setup access point\nManage connections"
+    style: wifi
+  }
+  
+  zeroconf: {
+    label: Zeroconf/mDNS
+    description: "Auto-discovery"
+    style: service
+  }
+  
+  # Files and services
+  config_file: {
+    label: config.yaml
+    style: config
+  }
+  
+  firebase_config: {
+    label: firebase_config.json
+    style: file
+  }
+  
+  system_service: {
+    label: System Service Manager
+    description: "Start/stop/restart"
+    style: process
+  }
+}
+
+# Client devices
+clients: {
+  label: Client Devices
+  style: container
+  style.fill: "#FFF8E1"
+  
+  mobile: {
+    label: Mobile Device
+    style: mobile
+  }
+  
+  laptop: {
+    label: Laptop/Desktop
+    style: laptop
+  }
+}
+
+# Camera system
+camera_system: {
+  label: MANTA Camera System
+  style: container
+  style.fill: "#E0F7FA"
+  
+  camera: {
+    label: Camera
+    style: camera
+  }
+  
+  main_app: {
+    label: Main Application
+    description: "camera/main.py"
+    style: component
+  }
+  
+  detection: {
+    label: Detection System
+    style: component
+  }
+}
+
+# Connections within remote configuration
+remote_config.http_server -> remote_config.web_interface: "Serves"
+remote_config.http_server -> remote_config.rest_api: "Provides"
+remote_config.rest_api -> remote_config.config_manager: "Updates"
+remote_config.config_manager -> remote_config.config_file: "Reads/Writes"
+remote_config.config_manager -> remote_config.config_backup: "Creates\nbackups"
+remote_config.config_manager -> remote_config.firebase_config: "Manages\ncredentials"
+remote_config.http_server -> remote_config.wifi_direct: "Controls"
+remote_config.http_server -> remote_config.zeroconf: "Registers\nservice"
+remote_config.http_server -> remote_config.system_service: "Controls"
+
+# Connections to clients
+clients.mobile -> remote_config.http_server: "HTTP\nWebSocket"
+clients.laptop -> remote_config.http_server: "HTTP\nWebSocket"
+clients.mobile -> remote_config.wifi_direct: "WiFi\nDirect"
+
+# Connections to camera system
+remote_config.config_file -> camera_system.main_app: "Configures"
+remote_config.system_service -> camera_system.main_app: "Controls"
+camera_system.camera -> camera_system.main_app: "Provides\nfeed"
+camera_system.main_app -> camera_system.detection: "Sends\nframes"
+
+# Add API endpoints
+api_endpoints: {
+  label: API Endpoints
+  style: container
+  style.fill: "#F5F5F5"
+  
+  get_config: {
+    label: "GET /api/config"
+    style: api
+  }
+  
+  update_config: {
+    label: "POST /api/config"
+    style: api
+  }
+  
+  system_info: {
+    label: "GET /api/system/info"
+    style: api
+  }
+  
+  restart: {
+    label: "POST /api/system/restart"
+    style: api
+  }
+  
+  reboot: {
+    label: "POST /api/system/reboot"
+    style: api
+  }
+  
+  download_config: {
+    label: "GET /api/config/download"
+    style: api
+  }
+  
+  upload_config: {
+    label: "POST /api/config/upload"
+    style: api
+  }
+}
+
+# Connect API endpoints
+api_endpoints.get_config -> remote_config.rest_api
+api_endpoints.update_config -> remote_config.rest_api
+api_endpoints.system_info -> remote_config.rest_api
+api_endpoints.restart -> remote_config.rest_api
+api_endpoints.reboot -> remote_config.rest_api
+api_endpoints.download_config -> remote_config.rest_api
+api_endpoints.upload_config -> remote_config.rest_api
+
+# Add annotations
+annotations: {
+  web_note: {
+    label: "Responsive UI with Thai language support"
+    target: remote_config.web_interface
+    style.font-size: 10
+  }
+  
+  wifi_note: {
+    label: "Creates 'MANTA-Direct' WiFi network\nIP: 192.168.42.1"
+    target: remote_config.wifi_direct
+    style.font-size: 10
+  }
+  
+  zeroconf_note: {
+    label: "Advertises as '_http._tcp.local'"
+    target: remote_config.zeroconf
+    style.font-size: 10
+  }
+  
+  security_note: {
+    label: "Backup all config changes\nwith timestamps"
+    target: remote_config.config_backup
+    style.font-size: 10
+  }
+}

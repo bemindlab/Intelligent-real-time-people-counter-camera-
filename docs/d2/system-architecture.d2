@@ -1,0 +1,247 @@
+## MANTA Camera System Architecture
+direction: right
+
+# Define styles
+styles: {
+  camera: {
+    shape: image
+    icon: https://icons.terrastruct.com/aws%2FInternet%20of%20Things%2FIoT_Camera_light-bg.svg
+    width: 80
+    height: 80
+  }
+  pi: {
+    shape: image
+    icon: https://icons.terrastruct.com/essentials%2F112-chip.svg
+    width: 70
+    height: 70
+  }
+  detector: {
+    shape: rectangle
+    fill: "#8BC34A"
+    stroke: "#689F38"
+    border-radius: 10
+    shadow: true
+  }
+  reid: {
+    shape: rectangle
+    fill: "#9C27B0"
+    stroke: "#7B1FA2"
+    border-radius: 10
+    shadow: true
+  }
+  logger: {
+    shape: rectangle
+    fill: "#03A9F4"
+    stroke: "#0288D1"
+    border-radius: 10
+    shadow: true
+  }
+  uploader: {
+    shape: rectangle
+    fill: "#FF9800"
+    stroke: "#F57C00"
+    border-radius: 10
+    shadow: true
+  }
+  api: {
+    shape: rectangle
+    fill: "#E91E63"
+    stroke: "#C2185B"
+    border-radius: 10
+    shadow: true
+  }
+  config: {
+    shape: document
+    fill: "#9E9E9E"
+    stroke: "#616161"
+  }
+  cloud: {
+    shape: cloud
+    fill: "#B3E5FC"
+    stroke: "#039BE5"
+  }
+  mobile: {
+    shape: image
+    icon: https://icons.terrastruct.com/essentials%2F362-smartphone.svg
+    width: 50
+    height: 50
+  }
+  container: {
+    border-radius: 10
+    shadow: true
+  }
+}
+
+title: {
+  label: MANTA Camera System Architecture
+  near: top-center
+  shape: text
+  style: {
+    font-size: 24
+    font-color: "#212121"
+    bold: true
+    underline: true
+  }
+}
+
+# Hardware components
+hardware: {
+  label: Hardware
+  style: container
+  style.fill: "#ECEFF1"
+  
+  camera: {
+    label: Camera
+    style: camera
+  }
+
+  raspberry_pi: {
+    label: Raspberry Pi
+    style: pi
+  }
+
+  camera -> raspberry_pi: Video Stream
+}
+
+# Core system
+core_system: {
+  label: Core System
+  style.fill: "#E1F5FE"
+  style: container
+
+  # Core modules
+  detection: {
+    label: Person Detection
+    description: "YOLOv8 model\nObject detection"
+    style: detector
+  }
+
+  reid: {
+    label: Person Re-identification
+    description: "Feature extraction\nPerson tracking"
+    style: reid
+  }
+
+  logger: {
+    label: Activity Logger
+    description: "Event recording\nActivity statistics"
+    style: logger
+  }
+
+  main_controller: {
+    label: Main Controller
+    description: "Orchestrates system\nProcesses frames"
+    style: detector
+  }
+
+  config_loader: {
+    label: Config Management
+    description: "Load settings\nEncryption support"
+    style: config
+  }
+
+  # Flow within core system
+  main_controller -> detection: frames
+  detection -> reid: detections
+  reid -> logger: tracked persons
+  config_loader -> main_controller: settings
+}
+
+# Network components
+network: {
+  label: Network Components
+  style.fill: "#E8F5E9"
+  style: container
+
+  uploader: {
+    label: Firebase Uploader
+    description: "Cloud synchronization"
+    style: uploader
+  }
+
+  remote_config: {
+    label: Remote Config Server
+    description: "HTTP API\nWeb interface"
+    style: api
+  }
+
+  wifi_direct: {
+    label: WiFi Direct
+    description: "Direct connection"
+    style: api
+  }
+}
+
+# External services
+external: {
+  label: External Services
+  style.fill: "#FFF3E0"
+  style: container
+
+  firebase: {
+    label: Firebase
+    description: "Cloud storage\nAnalytics"
+    style: cloud
+  }
+
+  client_devices: {
+    label: Client Devices
+    style: mobile
+  }
+
+  n8n: {
+    label: n8n
+    description: "Automation workflows"
+    style: cloud
+  }
+}
+
+# Connections between components
+hardware.raspberry_pi -> core_system.main_controller: camera input
+
+core_system.logger -> network.uploader: events
+
+network.uploader -> external.firebase: upload data
+network.remote_config -> external.client_devices: HTTP/WebSocket
+network.wifi_direct -> external.client_devices: direct connection
+network.remote_config -> core_system.config_loader: config updates
+external.n8n <- network.uploader: webhooks
+
+# Add annotations
+annotations: {
+  annotations.1: {
+    label: Supports multiple camera types
+    target: hardware
+    style.font-size: 12
+  }
+  
+  annotations.2: {
+    label: Can run on Raspberry Pi 4/5
+    target: hardware.raspberry_pi
+    style.font-size: 12
+  }
+  
+  annotations.3: {
+    label: Optimized for edge computing
+    target: core_system
+    style.font-size: 12
+  }
+  
+  annotations.4: {
+    label: ONNX model format for cross-platform support
+    target: core_system.detection
+    style.font-size: 12
+  }
+  
+  annotations.5: {
+    label: Secure and encrypted
+    target: core_system.config_loader
+    style.font-size: 12
+  }
+  
+  annotations.6: {
+    label: Remote configuration UI
+    target: network.remote_config
+    style.font-size: 12
+  }
+}

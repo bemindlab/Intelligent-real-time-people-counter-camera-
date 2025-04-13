@@ -1,0 +1,79 @@
+# MANTA การกำหนดค่าสำหรับ Raspberry Pi 5
+# Version: 1.0
+
+# การกำหนดค่ากล้อง (Camera Configuration)
+camera:
+  id: "rpi5_cam"  # รหัสประจำตัวกล้อง
+  source: 0  # 0 สำหรับกล้อง Raspberry Pi Camera Module หรือกล้อง USB เริ่มต้น
+  resolution:
+    width: 1280  # ความละเอียดที่สูงขึ้นสำหรับ RPi5
+    height: 720
+  fps: 20  # RPi5 สามารถจัดการกับอัตราเฟรมที่สูงขึ้นได้
+  prefer_picamera: true  # ใช้ PiCamera API ถ้ามี
+
+# การกำหนดค่าการตรวจจับ (Detection Configuration)
+detection:
+  model_path: "models/yolov8s.onnx"  # สามารถใช้โมเดลขนาดใหญ่ขึ้นบน RPi5
+  confidence_threshold: 0.5
+  nms_threshold: 0.45
+  device: "NPU"  # RPi5 มี NPU (ถ้ามีการรองรับ)
+  classes:
+    - person
+  frame_skip: 0  # ประมวลผลทุกเฟรม
+
+# การกำหนดค่าการจดจำบุคคล (Re-identification Configuration)
+reid:
+  feature_size: 128  # ใช้เวกเตอร์คุณลักษณะขนาดเต็ม
+  similarity_threshold: 0.6
+  retention_period: 3600  # จดจำบุคคลเป็นเวลา 1 ชั่วโมง
+  max_stored_vectors: 500  # เพิ่มความจุสำหรับการจดจำบุคคลมากขึ้น
+
+# การกำหนดค่าการบันทึกข้อมูล (Logging Configuration)
+logging:
+  local_path: "logs/rpi5_log.json"
+  log_level: "INFO"
+  retention_days: 7
+  log_flush_interval: 30  # บันทึกลงดิสก์บ่อยขึ้น
+
+# การกำหนดค่า Firebase (Firebase Configuration)
+firebase:
+  enabled: true
+  config_path: "firebase/firebase_config.json"
+  database_url: "https://your-project-id.firebaseio.com"
+  path_prefix: "cameras/rpi5"
+  retry_interval: 60
+  batch_size: 10
+  upload_interval: 120  # อัปโหลดทุก 2 นาที
+
+# การกำหนดค่า n8n (n8n Configuration)
+n8n:
+  webhook_url: "http://your-n8n-instance:5678/webhook/manta_rpi5"
+  notify_events:
+    - new_person
+    - person_exit
+    - zone_entry
+    - offline_mode
+    - error
+
+# การกำหนดค่าระบบ (System Configuration)
+system:
+  debug: false
+  show_video: true  # เปิดใช้งานการแสดงผลวิดีโอได้บน RPi5
+  memory_limit: 85  # อนุญาตให้ใช้หน่วยความจำมากขึ้น
+  cpu_threads: 0  # ใช้ทุกเธรดที่มี (0 = อัตโนมัติ)
+  enable_watchdog: true
+
+# การกำหนดค่าคุณสมบัติขั้นสูง (Advanced Features) - เฉพาะ RPi5
+advanced:
+  enable_tracking: true  # การติดตามการเคลื่อนไหวขั้นสูง
+  tracking_max_objects: 20
+  enable_zone_detection: true  # การตรวจจับการเข้าโซน
+  zones:
+    - name: "entry"
+      points: [[0, 0.7], [0.3, 0.7], [0.3, 1.0], [0, 1.0]]
+    - name: "exit"
+      points: [[0.7, 0.7], [1.0, 0.7], [1.0, 1.0], [0.7, 1.0]]
+  enable_counting: true  # การนับจำนวนคน
+  counting_line: [[0, 0.5], [1.0, 0.5]]
+  enable_heatmap: true  # การสร้างแผนที่ความร้อนการเคลื่อนไหว
+  heatmap_interval: 3600  # บันทึกแผนที่ความร้อนทุก 1 ชั่วโมง

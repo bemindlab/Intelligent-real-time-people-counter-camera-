@@ -1,0 +1,10 @@
+manta-camera (0.1.0) unstable; urgency=medium
+
+  * Initial release.
+  * Real-time person detection using YOLO models.
+  * Person re-identification for tracking between frames.
+  * Optimized for Raspberry Pi 4 and 5.
+  * Firebase integration for cloud storage.
+  * Configurable parameters for different installations.
+
+ -- BemindTech <info@bemind.tech>  Sun, 14 Apr 2024 12:00:00 +0700

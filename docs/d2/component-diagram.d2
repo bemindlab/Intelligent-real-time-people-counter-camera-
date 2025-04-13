@@ -1,0 +1,329 @@
+## MANTA Component Diagram
+direction: right
+
+# Define styles
+styles: {
+  module: {
+    shape: rectangle
+    fill: "#E1F5FE"
+    stroke: "#0288D1"
+    border-radius: 5
+    shadow: true
+  }
+  core: {
+    shape: rectangle
+    fill: "#E8F5E9"
+    stroke: "#388E3C"
+    border-radius: 5
+    shadow: true
+  }
+  util: {
+    shape: rectangle
+    fill: "#FFF8E1"
+    stroke: "#FFA000"
+    border-radius: 5
+    shadow: true
+  }
+  config: {
+    shape: hexagon
+    fill: "#F3E5F5"
+    stroke: "#8E24AA"
+  }
+  interface: {
+    shape: oval
+    fill: "#E0F7FA"
+    stroke: "#00ACC1"
+  }
+  class: {
+    shape: rectangle
+    fill: "#F5F5F5"
+    stroke: "#616161"
+    border-radius: 2
+    shadow: false
+  }
+  container: {
+    border-radius: 10
+    shadow: true
+  }
+}
+
+title: {
+  label: MANTA Camera - Component Diagram
+  near: top-center
+  shape: text
+  style: {
+    font-size: 24
+    font-color: "#212121"
+    bold: true
+    underline: true
+  }
+}
+
+# Core Camera Components
+camera_components: {
+  label: Camera Components
+  style: container
+  style.fill: "#ECEFF1"
+  
+  main: {
+    label: "main.py"
+    description: "Entry point\nSystem initialization"
+    style: core
+  }
+  
+  detection: {
+    label: "detection.py"
+    description: "YOLO model\nObject detection"
+    style: module
+    
+    PersonDetector: {
+      label: "PersonDetector"
+      style: class
+    }
+  }
+  
+  reid: {
+    label: "reid.py"
+    description: "Person tracking\nFeature matching"
+    style: module
+    
+    PersonReIdentifier: {
+      label: "PersonReIdentifier"
+      style: class
+    }
+  }
+  
+  logger: {
+    label: "logger.py"
+    description: "Activity logging\nStatistics"
+    style: module
+    
+    ActivityLogger: {
+      label: "ActivityLogger"
+      style: class
+    }
+  }
+  
+  uploader: {
+    label: "uploader.py"
+    description: "Firebase integration\nCloud sync"
+    style: module
+    
+    FirebaseUploader: {
+      label: "FirebaseUploader"
+      style: class
+    }
+  }
+}
+
+# Utility Components
+utils: {
+  label: Utility Components
+  style: container
+  style.fill: "#ECEFF1"
+  
+  camera_utils: {
+    label: "camera_utils.py"
+    description: "Camera initialization\nVideo stream handling"
+    style: util
+    
+    setup_camera: {
+      label: "setup_camera()"
+      style: class
+    }
+  }
+  
+  config_utils: {
+    label: "config_utils.py"
+    description: "Configuration management\nEncryption"
+    style: util
+    
+    load_encryption_key: {
+      label: "load_encryption_key()"
+      style: class
+    }
+    
+    decrypt_config_fields: {
+      label: "decrypt_config_fields()"
+      style: class
+    }
+  }
+  
+  webcam_utils: {
+    label: "webcam_utils.py"
+    description: "WebCam Protocol\nWiFi connectivity"
+    style: util
+    
+    WebcamConnection: {
+      label: "WebcamConnection"
+      style: class
+    }
+    
+    create_insta360_connection: {
+      label: "create_insta360_connection()"
+      style: class
+    }
+  }
+  
+  remote_config: {
+    label: "remote_config.py"
+    description: "HTTP server\nRemote configuration"
+    style: util
+    
+    RemoteConfigServer: {
+      label: "RemoteConfigServer"
+      style: class
+    }
+    
+    setup_remote_config: {
+      label: "setup_remote_config()"
+      style: class
+    }
+  }
+  
+  vector_utils: {
+    label: "vector_utils.py"
+    description: "Vector operations\nSimilarity calculations"
+    style: util
+  }
+  
+  encrypt_config: {
+    label: "encrypt_config.py"
+    description: "Encryption utilities\nCommand-line tools"
+    style: util
+  }
+}
+
+# Configuration and External Components
+config_components: {
+  label: Configuration Components
+  style: container
+  style.fill: "#ECEFF1"
+  
+  config_yaml: {
+    label: "config/*.yaml"
+    description: "Configuration files"
+    style: config
+  }
+  
+  config_rpi4: {
+    label: "config.rpi4.yaml"
+    description: "RPi 4 optimized"
+    style: config
+  }
+  
+  config_rpi5: {
+    label: "config.rpi5.yaml"
+    description: "RPi 5 optimized"
+    style: config
+  }
+  
+  config_webcam: {
+    label: "config.webcam.yaml"
+    description: "WebCam settings"
+    style: config
+  }
+  
+  firebase_config: {
+    label: "firebase/firebase_config.json"
+    description: "Firebase credentials"
+    style: config
+  }
+}
+
+# Interfaces and External Dependencies
+interfaces: {
+  label: External Interfaces
+  style: container
+  style.fill: "#ECEFF1"
+  
+  camera_interface: {
+    label: "Camera APIs"
+    description: "OpenCV / PiCamera"
+    style: interface
+  }
+  
+  firebase_api: {
+    label: "Firebase API"
+    description: "Cloud storage"
+    style: interface
+  }
+  
+  yolo_model: {
+    label: "YOLO Model"
+    description: "ONNX format"
+    style: interface
+  }
+  
+  http_interface: {
+    label: "HTTP/WebSocket"
+    description: "Remote config"
+    style: interface
+  }
+  
+  wifi_direct: {
+    label: "WiFi Direct API"
+    description: "P2P connectivity"
+    style: interface
+  }
+}
+
+# Connections between components
+camera_components.main -> camera_components.detection: "initializes"
+camera_components.main -> camera_components.reid: "initializes"
+camera_components.main -> camera_components.logger: "initializes"
+camera_components.main -> camera_components.uploader: "initializes"
+
+camera_components.main -> utils.camera_utils: "uses"
+camera_components.main -> utils.config_utils: "uses"
+camera_components.main -> utils.webcam_utils: "uses"
+camera_components.main -> utils.remote_config: "uses"
+
+utils.camera_utils -> interfaces.camera_interface: "accesses"
+utils.webcam_utils -> interfaces.camera_interface: "accesses"
+utils.webcam_utils -> interfaces.wifi_direct: "configures"
+utils.remote_config -> interfaces.http_interface: "provides"
+utils.remote_config -> interfaces.wifi_direct: "manages"
+
+camera_components.detection -> interfaces.yolo_model: "loads"
+camera_components.uploader -> interfaces.firebase_api: "accesses"
+
+utils.config_utils -> config_components.config_yaml: "loads"
+camera_components.main -> config_components.config_yaml: "reads"
+utils.remote_config -> config_components.config_yaml: "updates"
+
+# Internal component connections
+camera_components.detection.PersonDetector -> utils.vector_utils: "uses"
+camera_components.reid.PersonReIdentifier -> utils.vector_utils: "uses"
+utils.webcam_utils.WebcamConnection -> utils.camera_utils.setup_camera: "uses"
+
+# Add details for remote config
+utils.remote_config.RemoteConfigServer -> utils.config_utils: "uses for\nconfig management"
+utils.remote_config.RemoteConfigServer -> utils.webcam_utils: "manages\nWiFi connections"
+
+# Add annotations
+annotations: {
+  main_note: {
+    label: "Main controller orchestrates\nall system components"
+    target: camera_components.main
+    style.font-size: 10
+  }
+  
+  remote_note: {
+    label: "Provides web interface and API\nfor remote configuration"
+    target: utils.remote_config
+    style.font-size: 10
+  }
+  
+  config_note: {
+    label: "Hardware-specific configurations\nfor optimal performance"
+    target: config_components
+    style.font-size: 10
+  }
+  
+  webcam_note: {
+    label: "Manages connections to\nwebcam-compatible devices"
+    target: utils.webcam_utils
+    style.font-size: 10
+  }
+}

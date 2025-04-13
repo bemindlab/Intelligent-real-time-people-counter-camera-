@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+
+export PYBUILD_NAME=manta-camera
+export DH_VERBOSE=1
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_install:
+	dh_auto_install
+	# Create directories
+	mkdir -p debian/manta-camera/etc/manta-camera
+	mkdir -p debian/manta-camera/usr/share/manta-camera/models
+	mkdir -p debian/manta-camera/var/lib/manta-camera/logs
+	mkdir -p debian/manta-camera/var/lib/manta-camera/firebase
+
+	# Copy configuration files
+	cp -r config/*.yaml debian/manta-camera/etc/manta-camera/
+	# Copy service file
+	mkdir -p debian/manta-camera/lib/systemd/system
+	cp debian/manta-camera.service debian/manta-camera/lib/systemd/system/
+	# Set up file permissions
+	chmod 755 debian/manta-camera/usr/bin/manta-setup
+
+override_dh_auto_test:
+	# Skip tests for package build
+	:
+
+override_dh_installsystemd:
+	dh_installsystemd --name=manta-camera

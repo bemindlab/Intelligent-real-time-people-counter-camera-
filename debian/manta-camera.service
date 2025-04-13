@@ -1,0 +1,19 @@
+[Unit]
+Description=MANTA Camera Person Detection Service
+After=network.target
+Wants=network-online.target
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/share/manta-camera
+ExecStart=/usr/bin/python3 -m camera.main --config /etc/manta-camera/config.yaml
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

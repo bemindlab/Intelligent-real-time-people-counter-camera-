@@ -1,0 +1,6 @@
+debian/scripts/manta-setup usr/bin/
+config/*.yaml etc/manta-camera/
+camera/* usr/share/manta-camera/camera/
+utils/* usr/share/manta-camera/utils/
+models/requirements.txt usr/share/manta-camera/models/
+scripts/rpi_setup.sh usr/share/manta-camera/scripts/

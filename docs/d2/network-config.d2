@@ -1,0 +1,257 @@
+## MANTA Camera Network Configuration
+direction: right
+
+# Define styles
+styles: {
+  device: {
+    shape: rectangle
+    fill: "#E8EAF6"
+    stroke: "#3F51B5"
+    border-radius: 10
+    shadow: true
+  }
+  rpi: {
+    shape: image
+    icon: https://icons.terrastruct.com/essentials%2F112-chip.svg
+    width: 70
+    height: 70
+  }
+  camera: {
+    shape: image
+    icon: https://icons.terrastruct.com/aws%2FInternet%20of%20Things%2FIoT_Camera_light-bg.svg
+    width: 70
+    height: 70
+  }
+  network: {
+    shape: rectangle
+    fill: "#E3F2FD"
+    stroke: "#2196F3"
+    border-radius: 8
+    shadow: true
+  }
+  firebase: {
+    shape: cloud
+    fill: "#FFEBEE"
+    stroke: "#F44336"
+  }
+  mobile: {
+    shape: image
+    icon: https://icons.terrastruct.com/essentials%2F362-smartphone.svg
+    width: 50
+    height: 50
+  }
+  server: {
+    shape: rectangle
+    fill: "#E0F2F1"
+    stroke: "#00897B"
+    border-radius: 5
+    shadow: true
+  }
+  computer: {
+    shape: image
+    icon: https://icons.terrastruct.com/devices%2Flaptop.svg
+    width: 60
+    height: 60
+  }
+  router: {
+    shape: image
+    icon: https://icons.terrastruct.com/aws%2FNetworking%20&%20Content%20Delivery%2FGeneric-Router_light-bg.svg
+    width: 60
+    height: 60
+  }
+  protocol: {
+    shape: oval
+    fill: "#FFF9C4"
+    stroke: "#FBC02D"
+  }
+  container: {
+    border-radius: 10
+    shadow: true
+  }
+}
+
+title: {
+  label: MANTA Camera - Network Configuration
+  near: top-center
+  shape: text
+  style: {
+    font-size: 24
+    font-color: "#212121"
+    bold: true
+    underline: true
+  }
+}
+
+# Network setup
+network_diagram: {
+  # Local network components
+  local_network: {
+    label: Local Network
+    style: container
+    style.fill: "#ECEFF1"
+    
+    router: {
+      label: WiFi Router
+      style: router
+    }
+    
+    manta_device: {
+      label: MANTA Camera
+      style: container
+      style.fill: "#E8F5E9"
+      
+      rpi: {
+        label: Raspberry Pi
+        style: rpi
+      }
+      
+      camera: {
+        label: Camera Module
+        style: camera
+      }
+      
+      http_server: {
+        label: HTTP Config Server
+        style: server
+      }
+      
+      camera -> rpi: PiCamera or\nUSB Connection
+    }
+    
+    admin_device: {
+      label: Admin Device
+      style: computer
+    }
+    
+    mobile_app: {
+      label: Mobile Device
+      style: mobile
+    }
+    
+    # Local connections
+    router -> manta_device.rpi: Ethernet/WiFi\n(192.168.1.x)
+    router -> admin_device: Ethernet/WiFi
+    router -> mobile_app: WiFi
+    admin_device -> manta_device.http_server: HTTP (8080)
+    mobile_app -> manta_device.http_server: HTTP (8080)
+  }
+  
+  # External services
+  external_services: {
+    label: External Services
+    style: container
+    style.fill: "#FFF3E0"
+    
+    firebase: {
+      label: Firebase
+      style: firebase
+    }
+    
+    n8n_server: {
+      label: n8n Automation
+      style: server
+    }
+  }
+  
+  # WiFi Direct configuration
+  wifi_direct: {
+    label: WiFi Direct Connection
+    style: container
+    style.fill: "#F3E5F5"
+    
+    mobile_direct: {
+      label: Mobile Device
+      style: mobile
+    }
+    
+    rpi_hotspot: {
+      label: Raspberry Pi\n(Access Point)
+      style: rpi
+    }
+    
+    connection: {
+      label: WiFi Direct (192.168.42.x)
+      style: protocol
+    }
+    
+    mobile_direct -> connection
+    connection -> rpi_hotspot
+  }
+  
+  # Internet connections
+  internet: {
+    label: Internet
+    style: cloud
+    style.fill: "#E1F5FE"
+    style.stroke: "#03A9F4"
+  }
+  
+  # External connections
+  local_network.router -> internet: WAN Connection
+  internet -> external_services.firebase
+  internet -> external_services.n8n_server
+  
+  # Firebase connections
+  local_network.manta_device.rpi -> external_services.firebase: HTTPS\n(Data Upload)
+  external_services.n8n_server -> external_services.firebase: HTTPS\n(Data Processing)
+}
+
+# WebCam configuration
+webcam_config: {
+  label: WebCam Protocol Configuration
+  style: container
+  style.fill: "#E8EAF6"
+  
+  insta360: {
+    label: Insta360 Go 3S
+    style: camera
+  }
+  
+  wifi_connection: {
+    label: WiFi Connection
+    style: protocol
+  }
+  
+  rpi_client: {
+    label: Raspberry Pi
+    style: rpi
+  }
+  
+  rtmp_protocol: {
+    label: RTMP Stream
+    style: protocol
+  }
+  
+  # WebCam connections
+  insta360 -> wifi_connection: Creates WiFi\nAccess Point
+  wifi_connection -> rpi_client: Connects to\nCamera WiFi
+  insta360 -> rtmp_protocol: Streams video\nvia RTMP
+  rtmp_protocol -> rpi_client: Receives\nRTMP stream\n(rtmp://192.168.42.1:1935/live/stream)
+}
+
+# Add annotations for protocols
+annotations: {
+  http_note: {
+    label: "HTTP server provides web UI\nand REST API on port 8080"
+    target: network_diagram.local_network.manta_device.http_server
+    style.font-size: 11
+  }
+  
+  firebase_note: {
+    label: "Firebase Database used\nfor event storage and analytics"
+    target: network_diagram.external_services.firebase
+    style.font-size: 11
+  }
+  
+  wifi_direct_note: {
+    label: "WiFi Direct allows connection\nwithout existing network"
+    target: network_diagram.wifi_direct
+    style.font-size: 11
+  }
+  
+  rtmp_note: {
+    label: "RTMP stream from camera\nat 1080p resolution"
+    target: webcam_config.rtmp_protocol
+    style.font-size: 11
+  }
+}

@@ -1,0 +1,39 @@
+Source: manta-camera
+Section: video
+Priority: optional
+Maintainer: BemindTech <info@bemind.tech>
+Build-Depends: debhelper-compat (= 13), python3-all, python3-setuptools, dh-python
+Standards-Version: 4.5.1
+Homepage: https://github.com/BemindTech/bmt-manta-camera
+Vcs-Browser: https://github.com/BemindTech/bmt-manta-camera
+Vcs-Git: https://github.com/BemindTech/bmt-manta-camera.git
+Rules-Requires-Root: no
+
+Package: manta-camera
+Architecture: all
+Depends: ${python3:Depends},
+${misc:Depends},
+python3-opencv (>= 4.5.0),
+python3-numpy,
+python3-yaml,
+python3-pip,
+python3-picamera [armhf],
+libatlas-base-dev,
+libraspberrypi0 [armhf],
+raspi-config [armhf]
+Recommends: python3-firebase-admin
+Description: Person detection and tracking system for Raspberry Pi
+MANTA (Monitoring and Analytics Node for Tracking Activity) is a
+lightweight person detection and tracking system for Raspberry Pi.
+It uses computer vision to detect people, track them between frames,
+and record activity data for analysis.
+.
+Features:
+
+- Real-time person detection using YOLO models
+- Person re-identification for tracking between frames
+- Optimized for Raspberry Pi hardware
+- Firebase integration for cloud storage and analytics
+- Customizable parameters for different use cases
+- Local and cloud logging
+- Secure configuration with encryption

@@ -1,0 +1,68 @@
+# การกำหนดค่า MANTA สำหรับกล้อง WebCam Protocol (สำหรับ Insta360 Go 3S)
+# Version: 1.0
+
+# การกำหนดค่ากล้อง (Camera Configuration)
+camera:
+  id: "insta360_cam"  # รหัสประจำตัวกล้อง
+  # WebCam Protocol สำหรับ Insta360 Go 3S เชื่อมต่อผ่าน WiFi
+  # รูปแบบ: rtmp://[IP Address]:[Port]/[Stream Path]
+  source: "rtmp://192.168.42.1:1935/live/stream"  # แก้ไข IP address ตามที่ตั้งค่าในกล้อง Insta360
+  resolution:
+    width: 1920  # ความละเอียดสูงสุดสำหรับ Insta360 Go 3S
+    height: 1080
+  fps: 30  # อัตราเฟรมสูงสุดของ Insta360 Go 3S
+  retry_interval: 5  # ลองเชื่อมต่อใหม่ทุกๆ 5 วินาทีหากการเชื่อมต่อล้มเหลว
+  connection_timeout: 10  # เวลารอการเชื่อมต่อสูงสุด (วินาที)
+  enable_hardware_decode: true  # เปิดใช้งานการถอดรหัสด้วยฮาร์ดแวร์ (ช่วยให้ประสิทธิภาพดีขึ้น)
+
+# การกำหนดค่าการตรวจจับ (Detection Configuration)
+detection:
+  model_path: "models/yolov8n.onnx"  # โมเดลขนาดเล็กสำหรับประสิทธิภาพที่ดี
+  confidence_threshold: 0.5  # ค่าความเชื่อมั่นขั้นต่ำ (0-1)
+  nms_threshold: 0.45
+  device: "CPU"  # เปลี่ยนเป็น "GPU" หรือ "NPU" หากมีการรองรับ
+  classes:
+    - person  # ตรวจจับเฉพาะคน
+  frame_skip: 1  # ข้ามเฟรมเพื่อประสิทธิภาพที่ดีขึ้น (ทุกเฟรมที่ 2 จะถูกประมวลผล)
+
+# การกำหนดค่าการจดจำบุคคล (Re-identification Configuration)
+reid:
+  feature_size: 128
+  similarity_threshold: 0.6
+  retention_period: 3600  # จดจำบุคคลเป็นเวลา 1 ชั่วโมง
+  max_stored_vectors: 500
+
+# การกำหนดค่าการบันทึกข้อมูล (Logging Configuration)
+logging:
+  local_path: "logs/insta360_log.json"
+  log_level: "INFO"
+  retention_days: 7
+  log_flush_interval: 30
+
+# การกำหนดค่า Firebase (Firebase Configuration)
+firebase:
+  enabled: true
+  config_path: "firebase/firebase_config.json"
+  database_url: "https://your-project-id.firebaseio.com"
+  path_prefix: "cameras/insta360"
+  retry_interval: 60
+  batch_size: 10
+  upload_interval: 120
+
+# การกำหนดค่าสำหรับการเชื่อมต่อ WiFi (WiFi Connection Configuration)
+wifi:
+  enabled: true  # เปิดใช้งานการจัดการการเชื่อมต่อ WiFi
+  camera_ssid: "Insta360GO3S_XXXX"  # ชื่อ SSID ของกล้อง (แก้ไขตามกล้องของคุณ)
+  camera_password: "Insta!360"  # รหัสผ่าน WiFi เริ่มต้น (แก้ไขตามที่ตั้งค่า)
+  connection_check_interval: 30  # ตรวจสอบการเชื่อมต่อทุกๆ 30 วินาที
+  auto_reconnect: true  # เชื่อมต่อใหม่อัตโนมัติหากการเชื่อมต่อหลุด
+  backup_network_ssid: "YourHomeWiFi"  # เครือข่าย WiFi สำรองหากไม่สามารถเชื่อมต่อกับกล้องได้
+  backup_network_password: "YourHomeWiFiPassword"  # รหัสผ่านเครือข่าย WiFi สำรอง
+
+# การกำหนดค่าระบบ (System Configuration)
+system:
+  debug: false
+  show_video: true
+  memory_limit: 80
+  cpu_threads: 4
+  enable_watchdog: true
