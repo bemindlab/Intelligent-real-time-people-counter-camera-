@@ -1,0 +1,183 @@
+{
+  "name": "MANTA Person Detection Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "manta",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"event_type\"]}}",
+              "operation": "equal",
+              "value2": "new_person"
+            }
+          ]
+        }
+      },
+      "name": "If New Person",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"event_type\"]}}",
+              "operation": "equal",
+              "value2": "offline_mode"
+            }
+          ]
+        }
+      },
+      "name": "If Offline",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        460,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "title": "MANTA Person Detected",
+        "message": "=A new person was detected by camera {{$json[\"camera_id\"]}} at {{$json[\"timestamp\"]}}",
+        "options": {}
+      },
+      "name": "Send Person Alert",
+      "type": "n8n-nodes-base.pushover",
+      "typeVersion": 1,
+      "position": [
+        700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "title": "MANTA Camera Offline",
+        "message": "=Camera {{$json[\"camera_id\"]}} is in offline mode. Check connection.",
+        "options": {
+          "priority": "0"
+        }
+      },
+      "name": "Send Offline Alert",
+      "type": "n8n-nodes-base.pushover",
+      "typeVersion": 1,
+      "position": [
+        700,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "content": "=## MANTA Detection Alert\n\nCamera {{$json[\"camera_id\"]}} detected a new person.\n\n**Time:** {{$json[\"timestamp\"]}}\n**Person ID:** {{$json[\"person_hash\"]}}\n",
+        "options": {}
+      },
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [
+        700,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Store the detection data in a database\nreturn items;"
+      },
+      "name": "Process Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        880,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If New Person",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If Offline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If New Person": {
+      "main": [
+        [
+          {
+            "node": "Send Person Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Offline": {
+      "main": [
+        [
+          {
+            "node": "Send Offline Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Person Alert": {
+      "main": [
+        [
+          {
+            "node": "Process Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1",
+  "meta": {
+    "instanceId": "3f30f785b11bec2c91867b66be5b9f12be67b8f046f31d8ae8ca25112d513aad"
+  },
+  "tags": [
+    {
+      "name": "MANTA",
+      "createdAt": "2023-09-01T12:00:00.000Z",
+      "updatedAt": "2023-09-01T12:00:00.000Z"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# MANTA specific
+*.onnx
+models/*.pth
+models/*.pt
+models/*.weights
+models/coco.names
+dataset/images/*
+dataset/labels/*
+logs/*.log
+logs/*.json
+firebase/*config.json
+!firebase/firebase_config.example.json
+config/config.yaml
+!config/config.example.yaml
+.secret_key
+*.key
+
+# Test files
+tests/camera/*.jpg
+tests/camera/*.h264
+picamera_test.jpg
+picamera_video.h264
+
+# Encryption keys
+*.enc
+*.pem
+keys/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# n8n
+n8n/n8n_data/
+n8n/.n8n/
+
+# Raspberry Pi specific
+.Xauthority
+
+# Local development settings
+local_settings.py
+local_config.yaml
+
+# Miscellaneous
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/

@@ -1,0 +1,50 @@
+# ไฟล์ตัวอย่างการกำหนดค่า MANTA - คัดลอกและเปลี่ยนชื่อเป็น config.yaml
+# Version: 1.0
+
+# การกำหนดค่ากล้อง (Camera Configuration)
+camera:
+  id: "cam_001"  # Unique ID for this camera instance
+  source: 0  # 0 for default webcam, can be a RTSP URL or file path
+  resolution:
+    width: 640
+    height: 480
+  fps: 15
+
+# การกำหนดค่าการตรวจจับ (Detection Configuration)
+detection:
+  model_path: "../models/yolov8n.onnx"  # Path to YOLO model file
+  confidence_threshold: 0.5  # Minimum confidence for detection (0-1)
+  nms_threshold: 0.45  # Non-maximum suppression threshold (0-1)
+  device: "CPU"  # CPU, CUDA, NPU, etc.
+  classes:
+    - person  # Only detect people
+
+# การกำหนดค่าการจดจำบุคคล (Re-identification Configuration)
+reid:
+  feature_size: 128  # Size of feature vectors
+  similarity_threshold: 0.6  # Cosine similarity threshold (0-1)
+  retention_period: 3600  # How long to remember a person (in seconds)
+  max_stored_vectors: 1000  # Maximum number of feature vectors to store
+
+# การกำหนดค่าการบันทึกข้อมูล (Logging Configuration)
+logging:
+  local_path: "../logs/local_log.json"  # Path to local log file
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  retention_days: 7  # How many days to keep logs
+
+# การกำหนดค่า Firebase (Firebase Configuration)
+firebase:
+  enabled: false  # Set to true to enable Firebase logging
+  config_path: "../firebase/firebase_config.json"  # Path to Firebase config file
+  database_url: "https://your-project-id.firebaseio.com"  # Firebase database URL
+  path_prefix: "cameras"  # Path prefix in Firebase database
+  retry_interval: 60  # Seconds between retries when offline
+  batch_size: 10  # Number of logs to send in one batch
+
+# การกำหนดค่า n8n (n8n Configuration)
+n8n:
+  webhook_url: "http://your-n8n-instance:5678/webhook/manta"  # n8n webhook URL
+  notify_events:  # Events to notify n8n about
+    - new_person
+    - offline_mode
+    - error

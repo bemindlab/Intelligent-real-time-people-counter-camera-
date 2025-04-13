@@ -1,0 +1,6 @@
+numpy>=1.18.0
+opencv-python>=4.5.0
+pyyaml>=5.3.0
+firebase-admin>=5.0.0
+picamera[array]; platform_machine=="armv7l" or platform_machine=="armv6l"
+EOF < /dev/null
